@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Todo App"
+rootProject.name = "My Application"
 include(":app")
  
