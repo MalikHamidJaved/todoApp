@@ -35,6 +35,8 @@ fun HomeScreen(navController: NavController) {
 
     var draggedIndex by remember { mutableStateOf<Int?>(null) }
     var dragOffset by remember { mutableStateOf(Offset.Zero) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
 
     LaunchedEffect(tasks) {
         mutableTasks.clear()
@@ -50,7 +52,8 @@ fun HomeScreen(navController: NavController) {
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Task")
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
         if (mutableTasks.isEmpty()) {
             EmptyState(modifier = Modifier.padding(padding))
@@ -116,7 +119,20 @@ fun HomeScreen(navController: NavController) {
                                 isDragging = isDragging,
                                 onClick = {
                                     navController.navigate(Screen.TaskDetails.createRoute(task.id))
-                                }
+                                },
+                                onDelete = {
+                                    mutableTasks.remove(task)
+                                    viewModel.deleteTask(task)
+                                },
+                                onComplete = {
+                                    val updated = task.copy(isCompleted = !task.isCompleted)
+                                    val indexToUpdate = mutableTasks.indexOfFirst { it.id == task.id }
+                                    if (indexToUpdate != -1) {
+                                        mutableTasks[indexToUpdate] = updated
+                                    }
+                                    viewModel.updateTask(updated)
+                                },
+                                snackbarHostState = snackbarHostState
                             )
                         }
                     }
