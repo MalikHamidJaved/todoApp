@@ -14,11 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.skipper.taskManager.R
 import com.skipper.taskManager.data.model.SortOption
 import com.skipper.taskManager.data.model.TaskFilter
 import com.skipper.taskManager.di.AppModule
@@ -66,7 +68,7 @@ fun HomeScreen(navController: NavController
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Task Manager") }, actions = {
+                title = { Text(stringResource(R.string.task_manager)) }, actions = {
                     HomeScreenActions(
                         selectedFilter = selectedFilter,
                         onFilterSelected = { selectedFilter = it },
@@ -102,7 +104,11 @@ fun HomeScreen(navController: NavController
                         .padding(16.dp)
                 )
                 Text(
-                    text = "Completed: ${mutableTasks.count { it.isCompleted }} / ${mutableTasks.size}",
+                    text = stringResource(
+                        R.string.completed,
+                        mutableTasks.count { it.isCompleted },
+                        mutableTasks.size
+                    ),
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.padding(16.dp)
                 )

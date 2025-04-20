@@ -8,9 +8,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.skipper.taskManager.R
 import com.skipper.taskManager.data.model.Priority
 import com.skipper.taskManager.data.model.Task
 import com.skipper.taskManager.di.AppModule
@@ -46,7 +48,7 @@ fun CreateTaskScreen(navController: NavController) {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Create Task") })
+            TopAppBar(title = { Text(stringResource(R.string.create_task)) })
         }
     ) { padding ->
         Column(
@@ -82,8 +84,11 @@ fun CreateTaskScreen(navController: NavController) {
             Button(onClick = { datePickerDialog.show() }) {
                 Text(
                     text = if (dueDateMillis != null)
-                        "Due Date: ${Date(dueDateMillis!!).toLocaleString().substring(0, 11)}"
-                    else "Pick Due Date"
+                        stringResource(
+                            R.string.due_date,
+                            Date(dueDateMillis!!).toLocaleString().substring(0, 11)
+                        )
+                    else stringResource(R.string.pick_due_date)
                 )
             }
 
@@ -106,7 +111,7 @@ fun CreateTaskScreen(navController: NavController) {
                 enabled = title.isNotBlank(),
                 modifier = Modifier.align(Alignment.End)
             ) {
-                Text("Save Task")
+                Text(stringResource(R.string.save_task))
             }
         }
     }

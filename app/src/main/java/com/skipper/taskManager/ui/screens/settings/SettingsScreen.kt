@@ -7,34 +7,51 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.skipper.taskManager.R
 import com.skipper.taskManager.utils.SettingsDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(navController: NavController) {
-    SettingsScreenContent {}
+
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text(stringResource(R.string.settings)) })
+        }
+    ) { padding ->
+        SettingsScreenContent(modifier = Modifier.padding(padding)) {}
+    }
 }
 
 @Composable
-fun SettingsScreenContent(onColorChange: (Color) -> Unit) {
+fun SettingsScreenContent(modifier: Modifier, onColorChange: (Color) -> Unit) {
     val context = LocalContext.current
 
     Column(modifier = Modifier
-        .padding(top = 56.dp, start = 8.dp, end = 8.dp)
-        .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Select Primary Color", style = MaterialTheme.typography.titleMedium)
+        .fillMaxSize()
+        .then(modifier), horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            stringResource(R.string.select_primary_color),
+            style = MaterialTheme.typography.titleMedium
+        )
         Row {
             listOf(Color.Red, Color.Blue, Color.Green).forEach { color ->
                 Button(
