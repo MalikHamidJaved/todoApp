@@ -14,6 +14,8 @@ data class Task(
     val isCompleted: Boolean = false
 )
 
-enum class Priority {
-    LOW, MEDIUM, HIGH
-}
+enum class Priority { LOW, MEDIUM, HIGH }
+
+enum class TaskFilter { ALL, COMPLETED, PENDING }
+
+enum class SortOption { PRIORITY, DUE_DATE, ALPHABETICAL }

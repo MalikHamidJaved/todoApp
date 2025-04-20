@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
@@ -18,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.skipper.taskManager.data.model.SortOption
+import com.skipper.taskManager.data.model.TaskFilter
 import com.skipper.taskManager.di.AppModule
 import com.skipper.taskManager.navigation.Screen
 import com.skipper.taskManager.ui.viewModel.TaskViewModel
@@ -27,8 +30,8 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController) {
-    val viewModel: TaskViewModel = viewModel(factory = TaskViewModelFactory(AppModule.repository))
+fun HomeScreen(navController: NavController
+               ,viewModel: TaskViewModel = viewModel(factory = TaskViewModelFactory(AppModule.repository))) {
     val tasks by viewModel.tasks.collectAsState()
 
     val mutableTasks = remember(tasks) { mutableStateListOf(*tasks.toTypedArray()) }
@@ -37,6 +40,23 @@ fun HomeScreen(navController: NavController) {
     var dragOffset by remember { mutableStateOf(Offset.Zero) }
     val snackbarHostState = remember { SnackbarHostState() }
 
+    var selectedFilter by remember { mutableStateOf(TaskFilter.ALL) }
+    var selectedSort by remember { mutableStateOf<SortOption?>(null) }
+
+    // Apply filter
+    val filteredTasks = when (selectedFilter) {
+        TaskFilter.ALL -> mutableTasks
+        TaskFilter.COMPLETED -> mutableTasks.filter { it.isCompleted }
+        TaskFilter.PENDING -> mutableTasks.filter { !it.isCompleted }
+    }
+
+    // Apply sort
+    val displayedTasks = when (selectedSort) {
+        SortOption.PRIORITY -> filteredTasks.sortedByDescending { it.priority }
+        SortOption.DUE_DATE -> filteredTasks.sortedBy { it.dueDate ?: Long.MAX_VALUE }
+        SortOption.ALPHABETICAL -> filteredTasks.sortedBy { it.title }
+        else -> filteredTasks
+    }
 
     LaunchedEffect(tasks) {
         mutableTasks.clear()
@@ -44,7 +64,17 @@ fun HomeScreen(navController: NavController) {
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Task Manager") }) },
+        topBar = {
+            TopAppBar(
+                title = { Text("Task Manager") }, actions = {
+                    HomeScreenActions(
+                        selectedFilter = selectedFilter,
+                        onFilterSelected = { selectedFilter = it },
+                        selectedSort = selectedSort,
+                        onSortSelected = { selectedSort = it }
+                    )
+                })
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate(Screen.CreateTask.route) },
@@ -55,7 +85,7 @@ fun HomeScreen(navController: NavController) {
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
-        if (mutableTasks.isEmpty()) {
+        if (displayedTasks.isEmpty()) {
             EmptyState(modifier = Modifier.padding(padding))
         } else {
             Column(
@@ -63,6 +93,13 @@ fun HomeScreen(navController: NavController) {
                     .fillMaxSize()
                     .padding(padding)
             ) {
+                TaskCompletionIndicator(
+                    completedTasks = mutableTasks.count { it.isCompleted },
+                    totalTasks = mutableTasks.size,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(16.dp)
+                )
                 Text(
                     text = "Completed: ${mutableTasks.count { it.isCompleted }} / ${mutableTasks.size}",
                     style = MaterialTheme.typography.labelLarge,
@@ -70,7 +107,7 @@ fun HomeScreen(navController: NavController) {
                 )
 
                 LazyColumn {
-                    itemsIndexed(mutableTasks, key = { _, item -> item.id }) { index, task ->
+                    itemsIndexed(displayedTasks, key = { _, item -> item.id }) { index, task ->
                         val isDragging = draggedIndex == index
                         val offsetY by animateOffsetAsState(
                             targetValue = if (isDragging) dragOffset else Offset.Zero,
@@ -96,8 +133,9 @@ fun HomeScreen(navController: NavController) {
                                         },
                                         onDragEnd = {
                                             draggedIndex?.let { fromIndex ->
-                                                val toIndex = (fromIndex + (dragOffset.y / 150).toInt())
-                                                    .coerceIn(0, mutableTasks.lastIndex)
+                                                val toIndex =
+                                                    (fromIndex + (dragOffset.y / 150).toInt())
+                                                        .coerceIn(0, mutableTasks.lastIndex)
 
                                                 if (fromIndex != toIndex) {
                                                     val task = mutableTasks.removeAt(fromIndex)
@@ -126,7 +164,8 @@ fun HomeScreen(navController: NavController) {
                                 },
                                 onComplete = {
                                     val updated = task.copy(isCompleted = !task.isCompleted)
-                                    val indexToUpdate = mutableTasks.indexOfFirst { it.id == task.id }
+                                    val indexToUpdate =
+                                        mutableTasks.indexOfFirst { it.id == task.id }
                                     if (indexToUpdate != -1) {
                                         mutableTasks[indexToUpdate] = updated
                                     }
@@ -141,3 +180,6 @@ fun HomeScreen(navController: NavController) {
         }
     }
 }
+
+
+

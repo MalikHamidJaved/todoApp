@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
-    val tasks = repository.allTasks
+open class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
+    open val tasks = repository.allTasks
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     fun addTask(task: Task) = viewModelScope.launch {
