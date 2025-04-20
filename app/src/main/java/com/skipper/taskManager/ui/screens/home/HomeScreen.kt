@@ -71,7 +71,8 @@ fun HomeScreen(navController: NavController
                         selectedFilter = selectedFilter,
                         onFilterSelected = { selectedFilter = it },
                         selectedSort = selectedSort,
-                        onSortSelected = { selectedSort = it }
+                        onSortSelected = { selectedSort = it },
+                        onSettingsClicked = { navController.navigate(Screen.Settings.route)}
                     )
                 })
         },

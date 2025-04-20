@@ -1,8 +1,6 @@
 package com.skipper.taskManager.ui.screens.home
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -13,6 +11,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.skipper.taskManager.R
 import com.skipper.taskManager.data.model.SortOption
 import com.skipper.taskManager.data.model.TaskFilter
 
@@ -21,13 +24,19 @@ fun HomeScreenActions(
     selectedFilter: TaskFilter,
     onFilterSelected: (TaskFilter) -> Unit,
     selectedSort: SortOption?,
-    onSortSelected: (SortOption) -> Unit
+    onSortSelected: (SortOption) -> Unit,
+    onSettingsClicked: () -> Unit
 ) {
     var filterMenuExpanded by remember { mutableStateOf(false) }
     var sortMenuExpanded by remember { mutableStateOf(false) }
 
     IconButton(onClick = { filterMenuExpanded = true }) {
-        Icon(Icons.Default.Refresh, contentDescription = "Filter")
+        Icon(
+            painter = painterResource(R.drawable.ic_filter),
+            contentDescription = "Filter",
+            tint = Color.Gray,
+            modifier = Modifier.size(25.dp)
+        )
         DropdownMenu(
             expanded = filterMenuExpanded,
             onDismissRequest = { filterMenuExpanded = false }
@@ -57,7 +66,12 @@ fun HomeScreenActions(
     }
 
     IconButton(onClick = { sortMenuExpanded = true }) {
-        Icon(Icons.Default.ArrowDropDown, contentDescription = "Sort")
+        Icon(
+            painter = painterResource(R.drawable.ic_sort),
+            contentDescription = "Sort",
+            tint = Color.Gray,
+            modifier = Modifier.size(25.dp)
+        )
         DropdownMenu(
             expanded = sortMenuExpanded,
             onDismissRequest = { sortMenuExpanded = false }
@@ -84,5 +98,16 @@ fun HomeScreenActions(
                 }
             )
         }
+    }
+
+
+    IconButton(onClick = {  onSettingsClicked.invoke() }) {
+        Icon(
+            painter = painterResource(R.drawable.ic_settings),
+            contentDescription = "Settings",
+            tint = Color.Gray,
+            modifier = Modifier.size(25.dp)
+        )
+
     }
 }
