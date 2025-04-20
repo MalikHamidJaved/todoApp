@@ -30,7 +30,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -38,11 +37,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.skipper.taskManager.R
 import com.skipper.taskManager.data.model.Task
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
-import androidx.constraintlayout.compose.ConstraintLayout
 
 
 @Composable
