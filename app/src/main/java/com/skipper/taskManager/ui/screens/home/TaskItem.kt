@@ -10,9 +10,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -26,13 +30,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.skipper.taskManager.R
 import com.skipper.taskManager.data.model.Task
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import androidx.constraintlayout.compose.ConstraintLayout
+
 
 @Composable
 fun TaskItem(
@@ -48,24 +59,26 @@ fun TaskItem(
     var isVisible by remember { mutableStateOf(true) }
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     if (showDeleteConfirmation) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmation = false },
-            title = { Text("Delete Task") },
-            text = { Text("Are you sure you want to delete this task?") },
+            title = { Text(stringResource(R.string.delete_task)) },
+            text = { Text(stringResource(R.string.are_you_sure_you_want_to_delete_this_task)) },
             confirmButton = {
                 Button(onClick = {
                     showDeleteConfirmation = false
                     isVisible = false
                     scope.launch {
                         onDelete()
+
                         val result = snackbarHostState.showSnackbar(
-                            message = "Task deleted",
-                            actionLabel = "Undo"
+                            message = context.getString(R.string.task_deleted),
+                            actionLabel = context.getString(R.string.undo),
                         )
                         if (result == SnackbarResult.ActionPerformed) {
-                            // Optionally undo deletion
+
                         }
                         offsetX = 0f
                         isVisible = true
@@ -107,8 +120,8 @@ fun TaskItem(
                                     scope.launch {
                                         onComplete()
                                         val result = snackbarHostState.showSnackbar(
-                                            message = "Marked as completed",
-                                            actionLabel = "Undo"
+                                            message = context.getString(R.string.marked_as_completed),
+                                            actionLabel = context.getString(R.string.undo)
                                         )
                                         if (result == SnackbarResult.ActionPerformed) {
                                             onComplete() // Toggle back
@@ -135,16 +148,51 @@ fun TaskItem(
                 }
                 .clickable { onClick() }
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = task.title, style = MaterialTheme.typography.titleMedium)
-                task.description?.let {
-                    Text(text = it, style = MaterialTheme.typography.bodyMedium)
-                }
-                Text(
-                    text = "Priority: ${task.priority.name}",
-                    style = MaterialTheme.typography.labelMedium
+            TaskContent(task)
+        }
+    }
+}
+
+@Composable
+fun TaskContent(task: Task) {
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        val (checkIconRef, contentRef) = createRefs()
+
+        if (task.isCompleted) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = "Completed",
+                tint = Color(0xFF4CAF50),
+                modifier = Modifier
+                    .size(24.dp)
+                    .constrainAs(checkIconRef) {
+                        top.linkTo(parent.top)
+                        end.linkTo(parent.end)
+                    }
+            )
+        }
+
+        Column(
+            modifier = Modifier.constrainAs(contentRef) {
+                top.linkTo(parent.top)
+                start.linkTo(
+                     parent.start,
+                    margin = if (task.isCompleted) 8.dp else 0.dp
                 )
             }
+        ) {
+            Text(text = task.title, style = MaterialTheme.typography.titleMedium)
+            task.description?.let {
+                Text(text = it, style = MaterialTheme.typography.bodyMedium)
+            }
+            Text(
+                text = "Priority: ${task.priority.name}",
+                style = MaterialTheme.typography.labelMedium
+            )
         }
     }
 }
