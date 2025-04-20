@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.skipper.taskManager.di.AppModule
 import com.skipper.taskManager.navigation.AppNavGraph
 import com.skipper.taskManager.ui.theme.MyApplicationTheme
+import com.skipper.taskManager.utils.SettingsDataStore
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,27 +23,12 @@ class MainActivity : ComponentActivity() {
         AppModule.init(applicationContext)
 
         enableEdgeToEdge()
+
         setContent {
             MyApplicationTheme {
                 val navController = rememberNavController()
                 AppNavGraph(navController = navController)
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MyApplicationTheme {
-        Greeting("Android")
     }
 }

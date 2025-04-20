@@ -1,6 +1,7 @@
 package com.skipper.taskManager.ui.theme
 
 import android.app.Activity
+import android.graphics.Color
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -36,18 +37,24 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun MyApplicationTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
+    primaryColor: Color? = null,
     content: @Composable () -> Unit
 ) {
+    val defaultLight = LightColorScheme
+    val defaultDark = DarkColorScheme
+
+    val lightScheme = defaultLight.copy(primary = (primaryColor ?: defaultLight.primary) as androidx.compose.ui.graphics.Color)
+    val darkScheme = defaultDark.copy(primary = (primaryColor ?: defaultDark.primary) as androidx.compose.ui.graphics.Color)
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme -> darkScheme
+        else -> lightScheme
     }
 
     MaterialTheme(
